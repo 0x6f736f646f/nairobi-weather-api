@@ -11,5 +11,10 @@ class WeatherObject(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     node = graphene.relay.Node.Field()
     all_weather_data = SQLAlchemyConnectionField(WeatherObject)
+    find_location_data = graphene.Field(lambda: WeatherObject, location = graphene.String())
+    
+    def resolve_find_location_data(self, info, location):
+        data = Weather.query.filter_by(location=location).order_by(Weather.uuid.desc()).first()
+        return data
     
 our_schema = graphene.Schema(query=Query)
