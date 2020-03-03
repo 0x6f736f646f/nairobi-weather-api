@@ -14,7 +14,7 @@ class Query(graphene.ObjectType):
     find_location_data = graphene.Field(lambda: WeatherObject, location = graphene.String())
     
     def resolve_find_location_data(self, info, location):
-        data = Weather.query.filter_by(location=location).order_by(Weather.uuid.desc()).first()
-        return data
+        user = Weather.query.filter_by(location=location).first()
+        return user
     
 our_schema = graphene.Schema(query=Query)
