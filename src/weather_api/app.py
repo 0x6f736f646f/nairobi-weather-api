@@ -6,7 +6,7 @@ import time, atexit
 from apscheduler.schedulers.background import BackgroundScheduler
 from Utility.job import cron
 
-
+app.secret_key = os.environ['APP_SECRET_KEY']
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=our_schema, graphiql=True))
 
 @app.route('/')
