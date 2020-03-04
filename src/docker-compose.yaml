@@ -1,0 +1,68 @@
+version: '3'
+services:
+  postgres:
+    image: postgres #onjin/alpine-postgres
+    restart: always
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data"
+    ports:
+      - 1001:5432
+    env_file: 
+      - secrets.env
+    # networks: 
+    #   - backend_api
+
+  redis:
+    image: redis:alpine
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 3
+
+  flaskapp:
+    build: ./weather_api/
+    restart: always
+    volumes: ./weather_api:/app
+    env_file:
+      - secrets.env
+    volumes:
+      - ./weather_api:/app
+    command: "python3 app.py"
+    # networks:
+    #   - backend_api
+    depends_on:
+      - postgres
+      - redis
+    links:
+      - redis
+      - postgres
+    deploy:
+      mode: replicated
+      replicas: 3
+
+# networks:
+#   backend_api:
+#     driver: bridge
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet: 172.10.99.0/24
+
+# volumes:
+#   dbdata:
+
+#  # defining the redis NGINX forward proxy container for our web application
+#  nginx:
+#    # build the nginx Dockerfile: http://bit.ly/2kuYaIv
+#    build: nginx/
+#    restart: always
+#    # Expose port 80 to the host machine
+#    ports:
+#      - "80:80"
+#    deploy:
+#      mode: replicated
+#      replicas: 3
+#    # Our flask application needs to be available for NGINX to make successful proxy requests
+#    depends_on:
+#      - flaskapp
+ # defining our postgres database for our web application
